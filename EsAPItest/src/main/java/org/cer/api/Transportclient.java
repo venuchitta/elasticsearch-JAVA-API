@@ -50,7 +50,7 @@ public class Transportclient extends AbstractApi {
 
 
 	public void connect() throws ElasticsearchException, IOException {
-        final String indexName = "test1";
+        final String indexName = "test";
         final String documentType = "tweet";
         final String documentId = "1";
         final String fieldName = "foo";
@@ -58,12 +58,12 @@ public class Transportclient extends AbstractApi {
 
 
 		//For testing purposes we will create a test node so we can connect to
-		createLocalCluster("elasticsearch");
+		createLocalCluster("escluster2");
 
 		//Create the configuration - you can omit this step and use 
 		//non-argument constructor of TransportClient
 		Settings settings = ImmutableSettings.settingsBuilder()
-				.put("cluster.name", "elasticsearch").build();
+				.put("cluster.name", "escluster2").build();
 
 		//Create the transport client instance
 		TransportClient client = new TransportClient(settings);
@@ -84,11 +84,10 @@ public class Transportclient extends AbstractApi {
         // build json object
         final XContentBuilder contentBuilder = jsonBuilder().startObject().prettyPrint();
         contentBuilder.field(fieldName, value);
-
-        indexRequestBuilder.setSource(contentBuilder);
-        indexRequestBuilder.execute().actionGet();
+        contentBuilder.field("boo","venu");
+        indexRequestBuilder.setSource(contentBuilder).execute().actionGet();
         // Get document
-        System.out.println(getValue(client, indexName, documentType, documentId, fieldName));
+        System.out.println(getValue(client, indexName, documentType, documentId, "boo"));
 
 		//At the end we should close resources. In real scenario make sure do it in finally block.
 		client.close();

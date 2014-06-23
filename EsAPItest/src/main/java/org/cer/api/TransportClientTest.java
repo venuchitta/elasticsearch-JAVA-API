@@ -55,13 +55,7 @@ public class TransportClientTest extends AbstractApi {
 
 		//Now we can do something with ElasticSearch
 		//...
-		recreateIndex("library");
-		TypesExistsResponse TEresponse = client.admin().indices()
-				.prepareTypesExists("library")
-					.setTypes("book")
-					.execute().actionGet();
-			
-			System.out.println("Types exist: " + TEresponse.isExists());
+		
 
 		// Using JSON to create an index and type
 		String json = "{" +
