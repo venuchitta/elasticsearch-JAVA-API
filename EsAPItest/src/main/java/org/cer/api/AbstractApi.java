@@ -1,10 +1,15 @@
 package org.cer.api;
 
+import java.io.IOException;
 import java.util.logging.Logger;
+
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 
@@ -87,6 +92,25 @@ public class AbstractApi {
 		if (node != null) {
 			node.close();
 		}
+	}
+	
+	protected void createSomeBooks(final String index) throws ElasticsearchException, IOException {
+		getClient().prepareBulk()
+			.add(new IndexRequestBuilder(getClient(), "library").setId("1").setType("book").setSource(
+				XContentFactory.jsonBuilder()
+					.startObject()
+						.field("title", "Book A Title")
+						.field("num", 1)
+					.endObject()
+					).request())
+			.add(new IndexRequestBuilder(getClient(), "library").setType("book").setSource(
+				XContentFactory.jsonBuilder()
+					.startObject()
+						.field("title", "Book B Title")
+						.field("num", 10)
+					.endObject()
+					).request())
+			.execute().actionGet();
 	}
 	
 }

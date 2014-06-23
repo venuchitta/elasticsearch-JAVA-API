@@ -1,8 +1,10 @@
 package org.cer.api;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterIndexHealth;
 import org.elasticsearch.action.admin.cluster.node.hotthreads.NodeHotThreads;
@@ -17,7 +19,10 @@ import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResp
 import org.elasticsearch.action.admin.cluster.shards.ClusterSearchShardsGroup;
 import org.elasticsearch.action.admin.cluster.shards.ClusterSearchShardsResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
+import org.elasticsearch.action.admin.indices.exists.types.TypesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.cluster.routing.IndexRoutingTable;
@@ -25,6 +30,7 @@ import org.elasticsearch.common.collect.Maps;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.cer.api.AbstractApi;
@@ -32,7 +38,7 @@ import org.cer.api.AbstractApi;
 
 public class TransportClientTest extends AbstractApi {
 
-	public void connect() {
+	public void connect() throws ElasticsearchException, IOException {
 		//For testing purposes we will create a test node so we can connect to
 		createLocalCluster("escluster2");
 
@@ -49,7 +55,13 @@ public class TransportClientTest extends AbstractApi {
 
 		//Now we can do something with ElasticSearch
 		//...
-
+		recreateIndex("library");
+		TypesExistsResponse TEresponse = client.admin().indices()
+				.prepareTypesExists("library")
+					.setTypes("book")
+					.execute().actionGet();
+			
+			System.out.println("Types exist: " + TEresponse.isExists());
 
 		// Using JSON to create an index and type
 		String json = "{" +
@@ -65,6 +77,7 @@ public class TransportClientTest extends AbstractApi {
 		System.out.println(qb.toString());
 		System.out.println("Venus system runnig");
 		System.out.println(response.getIndex());
+		
 
 		// Getting the health of the cluster
 		ClusterHealthResponse resp = client.admin().cluster()
