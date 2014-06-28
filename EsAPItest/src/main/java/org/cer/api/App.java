@@ -1,3 +1,5 @@
+// The JAVA REST API which stores the data from the connectors to the Elasticsearch.
+
 package org.cer.api;
 
 import java.io.IOException;

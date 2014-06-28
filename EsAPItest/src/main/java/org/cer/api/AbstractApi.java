@@ -94,23 +94,26 @@ public class AbstractApi {
 		}
 	}
 	
-	protected void createSomeBooks(final String index) throws ElasticsearchException, IOException {
+	public void createSomeBooks(final String index, final String type) throws ElasticsearchException, IOException {
 		getClient().prepareBulk()
-			.add(new IndexRequestBuilder(getClient(), "library").setId("1").setType("book").setSource(
+			.add(new IndexRequestBuilder(getClient(), index).setId("1").setType(type).setSource(
 				XContentFactory.jsonBuilder()
 					.startObject()
 						.field("title", "Book A Title")
-						.field("num", 1)
+						.field("cibi_id", 1000110)
+						.field("descr", "Venusssssss")
 					.endObject()
 					).request())
-			.add(new IndexRequestBuilder(getClient(), "library").setType("book").setSource(
+			.add(new IndexRequestBuilder(getClient(), index).setType(type).setSource(
 				XContentFactory.jsonBuilder()
 					.startObject()
 						.field("title", "Book B Title")
-						.field("num", 10)
+						.field("cibi_id", 1000100)
+						.field("descr", "drdrdrdr")
 					.endObject()
 					).request())
 			.execute().actionGet();
+		System.out.println("Am in abstarctAPI");
 	}
 	
 }
